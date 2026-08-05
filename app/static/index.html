@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>丹数 · Danus 证明工坊</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="brand">丹数 <span class="ver">v0.1 · DanusWin</span></div>
+  <nav>
+    <button class="tab-btn active" data-tab="overview">总览</button>
+    <button class="tab-btn" data-tab="projects">项目</button>
+    <button class="tab-btn" data-tab="facts">事实图</button>
+    <button class="tab-btn" data-tab="settings">设置</button>
+  </nav>
+  <div id="verify-badge" class="badge"><span class="dot"></span><span id="verify-badge-text">验证服务: …</span></div>
+</header>
+
+<main>
+  <!-- ================= 总览 ================= -->
+  <section id="tab-overview" class="tab active">
+    <h2>总览</h2>
+    <div class="cards">
+      <div class="card" id="card-key"><div class="card-title">DeepSeek / OpenCode</div><div id="ov-key" class="card-val">未配置</div><div class="card-sub" id="ov-key-sub">—</div></div>
+      <div class="card" id="card-codex"><div class="card-title">Codex CLI</div><div id="ov-codex" class="card-val">未检测</div><div class="card-sub" id="ov-codex-sub">—</div></div>
+      <div class="card" id="card-verify"><div class="card-title">验证服务</div><div id="ov-verify" class="card-val">—</div><div class="card-sub" id="ov-verify-sub">—</div></div>
+      <div class="card" id="card-projects"><div class="card-title">项目</div><div id="ov-projects" class="card-val">0</div><div class="card-sub" id="ov-projects-sub">—</div></div>
+    </div>
+    <div class="panel">
+      <h3>环境检查与启动</h3>
+      <div class="btn-row">
+        <button class="btn" onclick="ovDetect()">检测环境</button>
+        <button class="btn" onclick="ovInstall()">安装 Codex CLI</button>
+        <button class="btn" onclick="ovProvider()">写入模型配置</button>
+        <button class="btn" onclick="ovPing()">测试连接</button>
+        <button class="btn primary" onclick="ovVerifyStart()">启动验证服务</button>
+        <button class="btn danger" onclick="ovVerifyStop()">停止验证服务</button>
+      </div>
+      <pre id="ov-result" class="log"></pre>
+    </div>
+    <div class="panel quiet">
+      <h3>使用流程（三步）</h3>
+      <ol class="steps">
+        <li><b>设置</b>：选提供商（OpenCode Go 或 DeepSeek 直连），填 API Key，保存。</li>
+        <li><b>总览</b>：检测环境 → 写入模型配置 → 测试连接 → 启动验证服务（不启动则无法产生任何事实）。</li>
+        <li><b>项目</b>：新建数学问题，启动 worker 群，观察「最近活动」与事实图成长；证完后「结题」并「导出报告」。</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ================= 项目 ================= -->
+  <section id="tab-projects" class="tab">
+    <div class="split">
+      <div class="col left">
+        <h2>项目</h2>
+        <div class="panel">
+          <h3>新建项目</h3>
+          <label>项目名（英文/数字/._-）</label>
+          <input id="np-name" placeholder="例如 bertrand">
+          <label>Worker 配置</label>
+          <select id="np-roles">
+            <option value="high:1,xhigh:1">1 普通 + 1 高（最快，省钱）</option>
+            <option value="high:2,xhigh:2" selected>2 普通 + 2 高（推荐）</option>
+            <option value="high:3,xhigh:4">3 普通 + 4 高（原始默认）</option>
+          </select>
+          <label>问题描述（原样粘贴数学问题/猜想）</label>
+          <textarea id="np-problem" rows="6" placeholder="例如：Prove Bertrand's postulate: for every integer n > 1, there exists a prime p such that n < p < 2n."></textarea>
+          <button class="btn primary" onclick="npCreate()">创建项目</button>
+        </div>
+        <div id="project-list" class="panel"></div>
+      </div>
+      <div class="col right">
+        <div id="project-detail"><div class="empty">← 选择一个项目，看 worker 群干活</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 事实图 ================= -->
+  <section id="tab-facts" class="tab">
+    <h2>事实图 <span id="facts-badge" class="dim"></span></h2>
+    <div class="split">
+      <div class="col left">
+        <div class="panel">
+          <label>选择项目</label>
+          <select id="facts-project"></select>
+          <label>搜索（留空显示最近事实）</label>
+          <div class="search-row" style="display:flex;gap:6px;margin-top:8px">
+            <input id="facts-q" placeholder="关键词 / 定理名…" style="flex:1">
+            <button class="btn" onclick="loadFacts()">搜索</button>
+          </div>
+          <div id="facts-list" class="list"></div>
+        </div>
+      </div>
+      <div class="col right">
+        <div id="fact-detail" class="panel"><div class="empty">← 点击左侧事实查看完整证明</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 设置 ================= -->
+  <section id="tab-settings" class="tab">
+    <h2>设置</h2>
+    <div class="panel" style="max-width:720px">
+      <h3>模型后端</h3>
+      <label>提供商</label>
+      <select id="st-provider" onchange="onProviderChange()">
+        <option value="opencode">OpenCode Go 套餐（推荐）</option>
+        <option value="deepseek">DeepSeek 官方直连</option>
+      </select>
+      <div id="st-provider-hint" class="dim" style="margin-top:8px;font-size:12px"></div>
+      <label>API Key（OpenCode Zen 控制台 或 DeepSeek 控制台获取）</label>
+      <input id="st-key" type="password" placeholder="粘贴你的 API Key">
+      <label>Base URL（一般不用改，自动按提供商填）</label>
+      <input id="st-base" placeholder="https://opencode.ai/zen/go/v1">
+      <label>Worker 模型（跑证明的，推荐 v4-flash 省钱）</label>
+      <input id="st-worker-model" placeholder="deepseek-v4-flash">
+      <label>验证模型（正确性把关，重要问题用 v4-pro）</label>
+      <input id="st-verify-model" placeholder="deepseek-v4-flash">
+      <label>策略咨询模型（Chat API）</label>
+      <input id="st-consult-model" placeholder="deepseek-v4-pro">
+      <label>推理强度（worker_effort）</label>
+      <select id="st-effort">
+        <option value="low">low</option>
+        <option value="medium">medium</option>
+        <option value="high">high</option>
+        <option value="xhigh" selected>xhigh</option>
+        <option value="max">max</option>
+      </select>
+      <label>验证服务端口</label>
+      <input id="st-port" placeholder="8091">
+      <label>Codex CLI (codex.js 路径，可留空自动检测)</label>
+      <input id="st-codex" placeholder="自动检测">
+      <label>Node 路径（可留空自动检测）</label>
+      <input id="st-node" placeholder="自动检测">
+      <div class="btn-row">
+        <button class="btn primary" onclick="stSave()">保存设置</button>
+        <button class="btn" onclick="stDetect()">自动检测工具路径</button>
+      </div>
+      <div id="st-result" class="log" style="margin-top:12px"></div>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

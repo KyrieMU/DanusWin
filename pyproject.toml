@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "danus"
+version = "0.1.0"
+description = "Danus — automated mathematics proof-search orchestration engine"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Bin Wu" }]
+keywords = ["mathematics", "proof-search", "multi-agent", "llm", "orchestration"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+# The truth layer (danus.core) is pure standard library. Per-module third-party
+# deps are declared as optional extras below and pulled in as each module lands
+# (see ARCHITECTURE.md).
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/KyrieMU/DanusWin"
+
+[project.optional-dependencies]
+gateway = ["mcp>=1.2,<2"]                                   # danus.gateway — role-gated MCP server
+write-paper = ["mcp>=1.2,<2"]                                     # danus.write_paper   — write-paper MCP service
+human-summary = ["mcp>=1.2,<2"]                                   # danus.human_summary — human-summary MCP service
+verify = ["fastapi", "uvicorn", "pydantic"]         # danus.verify  — cold-start verifier HTTP service
+observability = ["fastapi", "uvicorn", "pydantic"]  # danus.observability — read-only dashboard
+strategy = ["openai", "anthropic"]                  # danus.strategy — API consult transports
+desktop = ["fastapi", "uvicorn", "pydantic", "openai", "psutil", "mcp>=1.2,<2"]  # what 启动Danus.bat installs (Windows app)
+dev = ["pytest", "fastapi", "uvicorn", "pydantic", "openai", "anthropic", "psutil", "mcp>=1.2,<2"]  # full test suite (all modules)
+
+[tool.setuptools.packages.find]
+include = ["danus*"]
+
+[tool.setuptools.package-data]
+"danus.core" = ["*.json"]

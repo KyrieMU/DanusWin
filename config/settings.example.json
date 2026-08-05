@@ -1,0 +1,14 @@
+{
+  "provider": "deepseek",
+  "api_key": "",
+  "base_url": "https://api.deepseek.com",
+  "worker_model": "deepseek-v4-flash",
+  "worker_effort": "xhigh",
+  "verify_model": "deepseek-v4-flash",
+  "verify_effort": "xhigh",
+  "consult_model": "deepseek-v4-pro",
+  "verify_port": "8091",
+  "roles": "high:2,xhigh:2",
+  "codex_js": "",
+  "node_bin": ""
+}

@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Local environment
+.venv/
+
+# Danus runtime data (projects, fact graphs, codex home, logs, verify runs)
+runtime/
+
+# Secrets & local config (NEVER commit your API key)
+config/settings.json
+config/*.env
+
+# Scratch / diagnostics
+_scratch/
+
+# OS
+Thumbs.db
+.DS_Store
+Desktop.ini
